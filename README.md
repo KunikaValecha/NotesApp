@@ -8,5 +8,5 @@ This is demo Notes Saving project
 * This app uses room for caching.
 * Follows MVVM(Model-View-ViewModel) archietecture.
 
-<img src="Notes.jpeg"  width="300" height="500">       <img src="Notes_Search.jpeg"  width="300" height="500">       <img src="home_screen.jpeg"  width="300" height="500">
+<img src="Notes.jpeg"  width="300" height="500"> &nbsp;&nbsp;&nbsp;&nbsp; <img src="Notes_Search.jpeg"  width="300" height="500">       <img src="home_screen.jpeg"  width="300" height="500">
 
