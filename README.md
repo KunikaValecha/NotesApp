@@ -1,4 +1,4 @@
-# 📜 NotesApp
+# NotesApp
 
 This is demo Notes Saving project
 
