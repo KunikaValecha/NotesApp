@@ -15,4 +15,10 @@ interface NoteDao {
 
     @Query("SELECT * from note where title like :query order by uid DESC ")
     suspend fun searchNotes(query: String): List<Note>
+
+    @Query("UPDATE note SET title = :titleUpdated , text = :body WHERE uid = :id")
+    suspend fun edit(titleUpdated : String, body:String, id: Int )
+
+    @Query("DELETE FROM note WHERE uid = :id")
+    suspend fun delete(id: Int )
 }

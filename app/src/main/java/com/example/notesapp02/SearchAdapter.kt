@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class SearchAdapter : ListAdapter<Note, NoteViewHolder>(ITEM_CALLBACK) {
+class SearchAdapter(private var onClick:(note:Note)-> Unit,private var onDelete:(note:Note)->Unit): ListAdapter<Note, NoteViewHolder>(ITEM_CALLBACK) {
     companion object {
         val ITEM_CALLBACK = object : DiffUtil.ItemCallback<Note>() {
             override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
@@ -22,7 +22,7 @@ class SearchAdapter : ListAdapter<Note, NoteViewHolder>(ITEM_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.each_cell, parent, false)
-        return NoteViewHolder(view)
+        return NoteViewHolder(view, onClick = onClick, onDelete = onDelete)
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {

@@ -24,7 +24,7 @@ class DialogFAB : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.dialog, container, false)
+        return inflater.inflate(R.layout.detailed_note_fragment, container, false)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

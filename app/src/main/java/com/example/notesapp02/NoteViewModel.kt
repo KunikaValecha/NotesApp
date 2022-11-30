@@ -29,6 +29,18 @@ class NoteViewModel(private val mApp: Application) : AndroidViewModel(mApp) {
         }
     }
 
+    fun edit(note: Note) {
+        viewModelScope.launch {
+            noteDao.edit(note.title, note.text, note.uid)
+        }
+    }
+
+    fun delete(note: Note) {
+        viewModelScope.launch {
+            noteDao.delete(note.uid)
+        }
+    }
+
     fun search(query: String) {
         viewModelScope.launch {
             val listOfSearch = noteDao.searchNotes("%$query%")
