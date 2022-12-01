@@ -6,16 +6,19 @@ import android.view.LayoutInflater
 import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class SearchActivity:AppCompatActivity() {
-    private val viewModel by lazy{
+class SearchActivity : AppCompatActivity() {
+
+    private val viewModel by lazy {
         ViewModelProvider(this).get(NoteViewModel::class.java)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.search)
@@ -25,8 +28,12 @@ class SearchActivity:AppCompatActivity() {
         searchET.doAfterTextChanged {
             viewModel.search(it.toString())
         }
+        findViewById<AppCompatImageView>(R.id.ivBack).setOnClickListener{
+            onBackPressed()
+        }
         rView.layoutManager = LinearLayoutManager(this)
-        val adapter = NoteAdapter (
+        rView.addItemDecoration(GridSpacingItemDecoration(1, 10.dp, true))
+        val adapter = NoteAdapter(
             onClick =
             {
                 val fragment = NoteDetailed()
@@ -44,27 +51,10 @@ class SearchActivity:AppCompatActivity() {
                     .addToBackStack("CUSTOM")
                     .commit()
             },
-            onDelete =
-            {note ->
-                val popupWindowLayout = LayoutInflater.from(this).inflate(R.layout.options_popup, null)
-                val popupWindow = PopupWindow(
-                    popupWindowLayout, 120.dp,
-                    170.dp, true
-                )
-                popupWindow.elevation = "20".toFloat()
-                popupWindow.showAsDropDown(findViewById(R.id.NotesRV), -16, 0, Gravity.END)
-                popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvDelete).setOnClickListener {
-                    if (note.text.isNullOrBlank().not() && note.title.isNullOrBlank().not()) {
-                        viewModel.delete(note)
-                        popupWindow.dismiss()
-                    }
-
-                }
-
-            }
-                )
+            onDelete = {note, view->}
+        )
         rView.adapter = adapter
-        viewModel.searchLiveData.observe(this){
+        viewModel.searchLiveData.observe(this) {
             adapter.submitList(it)
         }
     }

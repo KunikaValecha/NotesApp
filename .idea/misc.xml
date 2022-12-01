@@ -7,10 +7,13 @@
         <entry key="app/src/main/res/drawable/bg_20dp.xml" value="0.13" />
         <entry key="app/src/main/res/drawable/custom_cell_bg.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_circle_24.xml" value="0.1835" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_ios_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_ios_new_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/ic_round_account_circle_24.xml" value="0.13" />
+        <entry key="app/src/main/res/drawable/ic_round_add_circle_24.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.27309782608695654" />
         <entry key="app/src/main/res/layout/detailed_note_fragment.xml" value="0.1796875" />
         <entry key="app/src/main/res/layout/dialog.xml" value="0.27309782608695654" />

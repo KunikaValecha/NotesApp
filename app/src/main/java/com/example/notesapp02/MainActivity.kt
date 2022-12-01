@@ -10,6 +10,7 @@ import android.widget.PopupWindow
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,10 +25,10 @@ class MainActivity : AppCompatActivity() {
 
     private var currentSpanCount = Constants.SPAN_COUNT
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         val recyclerView = findViewById<RecyclerView>(R.id.NotesRV)
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         val searchBar = findViewById<AppCompatImageView>(R.id.search_bar)
@@ -40,73 +41,77 @@ class MainActivity : AppCompatActivity() {
             showDialog()
         }
         recyclerView.layoutManager = GridLayoutManager(this, 2)
-        recyclerView.addItemDecoration(GridSpacingItemDecoration(currentSpanCount,10.dp, true))
+        recyclerView.addItemDecoration(GridSpacingItemDecoration(currentSpanCount, 10.dp, true))
         findViewById<AppCompatImageView>(R.id.option).setOnClickListener {
             val popupWindowLayout = LayoutInflater.from(this).inflate(R.layout.options_popup, null)
-            popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvReminder).text = "About"
-            popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).text = getString(R.string.list_view)
+            popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).text =
+                getString(R.string.list_view)
             val popupWindow = PopupWindow(
                 popupWindowLayout, 120.dp,
-                170.dp, true
+                100.dp, true
             )
             popupWindow.elevation = "20".toFloat()
-            popupWindow.showAsDropDown(findViewById(R.id.option), 14, 0, Gravity.END)
-            if(currentSpanCount == 2){
-                popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).text = getString(R.string.list_view)
+            popupWindow.showAsDropDown(findViewById(R.id.option), -17, -17, Gravity.END)
+            if (currentSpanCount == 2) {
+                popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).text =
+                    getString(R.string.list_view)
+            } else {
+                popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).text =
+                    getString(R.string.grid_view)
             }
-            else{
-                popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).text = getString(R.string.grid_view)
-            }
-            popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).setOnClickListener{
+            popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).setOnClickListener {
                 updateSpanCount()
+                popupWindow.dismiss()
+            }
+            popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvDelete).text = "Delete All"
+            popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvDelete).setOnClickListener {
+                viewModel.deleteAll()
                 popupWindow.dismiss()
             }
 
         }
-
-
         val adapter = NoteAdapter(onClick = {
-            val fragment = NoteDetailed()
-            val bundle = Bundle()
-            val title = it.title
-            val body = it.text
-            val id = it.uid
-            bundle.putString("TITLE", title)
-            bundle.putString("BODY", body)
-            bundle.putInt("ID", id)
-            fragment.arguments = bundle
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.detailedFragment, fragment, "CUSTOM")
-                .addToBackStack("CUSTOM")
-                .commit()
-        }, onDelete = {note ->
-            val popupWindowLayout = LayoutInflater.from(this).inflate(R.layout.options_popup, null)
-            val popupWindow = PopupWindow(
-                popupWindowLayout, 120.dp,
-                170.dp, true
-            )
-            popupWindow.elevation = "20".toFloat()
-            popupWindow.showAsDropDown(findViewById(R.id.NotesRV), -16, 0, Gravity.END)
-            popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvDelete).setOnClickListener {
-                if (note.text.isNullOrBlank().not() && note.title.isNullOrBlank().not()) {
-                    viewModel.delete(note)
+            edit(it)
+        },
+            onDelete = { note , view ->
+                val popupWindowLayout =
+                    LayoutInflater.from(this).inflate(R.layout.options_popup, null)
+                val popupWindow = PopupWindow(
+                    popupWindowLayout, 120.dp,
+                    100.dp, true
+                )
+                popupWindow.elevation = "20".toFloat()
+                popupWindow.showAsDropDown(view, 20, -200, Gravity.END)
+                popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvDelete)
+                    .setOnClickListener {
+                        if (note.text.isNullOrBlank().not() && note.title.isNullOrBlank().not()) {
+                            viewModel.delete(note)
+                            popupWindow.dismiss()
+                        }
+                    }
+                popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).text = "Edit"
+                popupWindowLayout.findViewById<AppCompatTextView>(R.id.tvPin).setOnClickListener {
+                    edit(note)
                     popupWindow.dismiss()
                 }
 
-            }
 
-        })
+            })
         recyclerView.adapter = adapter
 
-        viewModel.noteLiveData.observe(this){
+        viewModel.noteLiveData.observe(this) {
             adapter.submitList(it)
         }
     }
+
     fun showDialog() {
-        val fragmentManager = supportFragmentManager
+
         val newFragment = DialogFAB()
-        newFragment.show(fragmentManager, "dialog")
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.detailedFragment, newFragment, "CUSTOM")
+            .addToBackStack("CUSTOM")
+            .commit()
     }
 
     private fun updateSpanCount() {
@@ -120,7 +125,26 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<RecyclerView>(R.id.NotesRV).post {
             TransitionManager.beginDelayedTransition(findViewById<RecyclerView>(R.id.NotesRV))
-            findViewById<RecyclerView>(R.id.NotesRV).layoutManager = GridLayoutManager(this, currentSpanCount)
+            findViewById<RecyclerView>(R.id.NotesRV).layoutManager =
+                GridLayoutManager(this, currentSpanCount)
         }
+    }
+
+    private fun edit(note: Note) {
+
+        val fragment = NoteDetailed()
+        val bundle = Bundle()
+        val title = note.title
+        val body = note.text
+        val id = note.uid
+        bundle.putString("TITLE", title)
+        bundle.putString("BODY", body)
+        bundle.putInt("ID", id)
+        fragment.arguments = bundle
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.detailedFragment, fragment, "CUSTOM")
+            .addToBackStack("CUSTOM")
+            .commit()
     }
 }

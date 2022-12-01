@@ -12,6 +12,9 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 class DialogFAB : DialogFragment() {
 
@@ -49,18 +52,41 @@ class DialogFAB : DialogFragment() {
         val title = view.findViewById<AppCompatEditText>(R.id.dialogTitle)
         val body = view.findViewById<AppCompatEditText>(R.id.dialogBody)
         val save = view.findViewById<AppCompatImageView>(R.id.check)
+        val titleText = title.text
+        val bodyText = body.text
+        val sdf = SimpleDateFormat("MMMM dd yyyy,  hh:mm a")
+        val currentDate = sdf.format(Date())
         save.setOnClickListener {
-            val titleText = title.text
-            val bodyText = body.text
             if (titleText.isNullOrBlank().not() and bodyText.isNullOrBlank().not()) {
-                val note = Note(title = titleText.toString(), text = bodyText.toString())
+                val note = Note(title = titleText.toString(), text = bodyText.toString(), date = currentDate)
                 viewModel.insert(note = note)
+                it.context.hideKeyboard(it)
                 dismissAllowingStateLoss()
             } else {
                 Toast.makeText(requireContext(), "Please enter valid input", Toast.LENGTH_SHORT)
                     .show()
             }
 
+        }
+
+        view.findViewById<AppCompatImageView>(R.id.delete).setOnClickListener {
+            if (titleText.isNullOrBlank().not() and bodyText.isNullOrBlank().not()) {
+                val note = Note(
+                    title = titleText.toString(),
+                    text = bodyText.toString(),
+                    uid = id,
+                    date = currentDate
+                )
+                viewModel.delete(note)
+                it.context.hideKeyboard(it)
+                requireActivity().onBackPressed()
+            }
+
+        }
+
+        view.findViewById<AppCompatImageView>(R.id.back).setOnClickListener {
+            it.context.hideKeyboard(it)
+            requireActivity().onBackPressed()
         }
 
     }

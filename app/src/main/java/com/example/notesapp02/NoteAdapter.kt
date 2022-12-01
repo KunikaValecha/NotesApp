@@ -1,13 +1,17 @@
 package com.example.notesapp02
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class NoteAdapter(private val onClick : (note:Note)->Unit, private val onDelete:(note:Note)->Unit): ListAdapter<Note, NoteViewHolder>(ITEM_CALLBACK) {
+class NoteAdapter(
+    private val onClick: (note: Note) -> Unit,
+    private val onDelete: (note: Note, view:View) -> Unit
+) : ListAdapter<Note, NoteViewHolder>(ITEM_CALLBACK) {
     companion object {
-        private val ITEM_CALLBACK = object : DiffUtil.ItemCallback<Note>(){
+        private val ITEM_CALLBACK = object : DiffUtil.ItemCallback<Note>() {
             override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
                 return oldItem.uid == newItem.uid
             }
